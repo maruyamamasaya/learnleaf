@@ -10,7 +10,7 @@ ID、filename、created、type、tagsのFrontmatterは現在のObsidianテンプ
 
 ## 一括更新
 
-Windowsでは`sync-and-publish.cmd`、Macでは`sync-and-publish.command`を使います。Macの起動確認は`start-learnleaf.command`で既存docsを配信します（同期なし）。Macの公開スクリプトは原本照合完了の明示がない限り停止します。コマンドからは次のとおりです。
+Windowsでは`sync-and-publish.cmd`、Macでは`sync-and-publish.command`を使います。Macの起動確認は`start-learnleaf.command`で既存docsを配信します（同期なし）。Macの原本コピー・ZIP照合は完了済みです。公開スクリプトはwikiの存在、CLIはoriginとmainを検証します。コマンドからは次のとおりです。
 
 ```powershell
 npm run vault:publish

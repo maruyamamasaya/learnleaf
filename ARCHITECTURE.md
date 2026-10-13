@@ -102,4 +102,4 @@ Astro・OpenAI Sites・Codex CLIによる公開経路は現行構成にない。
 
 ## Macの起動と移行中の公開制御
 
-`start-learnleaf.command`は既存docsのHTTP配信のみ、`sync-and-publish.command`は公開CLIを起動する。両者はMacのLearnleaf Vaultを`STUDY_APP_VAULT`の既定値として設定する。公開用は原本照合完了の明示環境変数とwikiの存在を確認してからCLIへ渡す。公開CLIはlearnleafのoriginだけを許可する。移行中の実際のリモート・配信URLと未完了事項はMAC_MIGRATION.mdに記載。
+`start-learnleaf.command`は既存docsのHTTP配信のみ、`sync-and-publish.command`は公開CLIを起動する。両者はMacのLearnleaf Vaultを`STUDY_APP_VAULT`の既定値として設定する。原本照合は完了済み。公開用はwikiの存在を確認してからCLIへ渡す。Node 24のHomebrew kegを優先する。公開CLIはlearnleafのoriginだけを許可する。実際のリモート・配信URLと端末更新の残課題はMAC_MIGRATION.mdに記載。

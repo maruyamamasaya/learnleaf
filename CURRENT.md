@@ -4,10 +4,10 @@
 
 iOS図解・資料・プレゼン（2026-10-08）: 端末内原本管理、静的SVG、PDFKit、Word Quick Look、PPTX原本+登録PDF、記事からの構造分割スライド・編集・関連付け・出力、検索/設定統合を追加。実装範囲と制限は[ios/VISUAL_RESOURCES.md](ios/VISUAL_RESOURCES.md)。ユーザー指定で今回のビルド・テスト・実機確認は別途。過去の検証結果は今回の変更を含まない。資料全体バックアップと端末間同期は未対応。
 
-- 現行方式はDocsify。Obsidian Vault `Document organization`の`wiki/`が記事の唯一の正本。
+- 現行方式はDocsify。Obsidian Vault `Learnleaf`の`wiki/`が記事の唯一の正本。
 - 現在のiOS下部タブは記事・聴く・見る・フォルダ・設定。「見る」はプレゼン/PDF/Word/PowerPoint、検索は記事ホーム内。SVG/画像は記事用素材として既存ライブラリに残す。今回の表示・操作確認は別途。
 - UIはスマホ中心の新しいreaderへ刷新。旧DocsifyテーマCSSを廃止し、900px以下ではフォルダパネル・検索/目次操作、PCでは左sidebarと中央本文を表示する。
-- `docs/`に55記事と一覧・索引を同期する。案件WikiのRAG学習記事50件を追加。FrontmatterのIDを維持し、title・aliasでWiki Linkを解決する。
+- `docs/`に390記事と一覧・索引を同期する。案件WikiのRAG学習記事50件を追加。FrontmatterのIDを維持し、title・aliasでWiki Linkを解決する。
 - 保存フォルダと記事種別は独立。`wiki/anken001/`内の`type: study`も原本どおり同期し、研修一覧に掲載する。
 - `npm run vault:prepare`で同期・索引生成・テスト。`sync-and-publish.cmd`または`npm run vault:publish`でその後GitHubへのcommit/pushを行う。Codex・AIは使用しない。
 - 日常の同期・公開は成功時の要約のみ表示し、記事の末尾空白では停止しない。Frontmatter/ID/上書き保護とテストは維持。詳細ログは`--verbose`。
@@ -119,10 +119,7 @@ Learnleafロードマップ段階1〜5（2026-10-06）: ユーザー指示で段
 
 リモート反映（2026-10-07）: ユーザー承認で統合済みLearnleaf変更をmainへcommit/pushする。前回のWeb24件・iOS51件成功を確認。公開記事の差分はなく、Pagesの自動deploy対象外。実機手動確認の残課題は継続。
 
-<<<<<<< HEAD
-Mac移行（2026-10-13）: `codex/learnleaf-mac-migration`で名称統一を準備。開発コードは`~/Development/learnleaf`、原本VaultをiCloud Obsidianの`Learnleaf`へ名前変更し、既存7ファイルの退避・hash一致を確認。Windows原本ZIP未受領、wikiなしのため同期・記事削除・公開は禁止。Mac用起動/公開スクリプトを追加。GitHubの目標は`maruyamamasaya/learnleaf`だがリモート改名・origin変更は未実施。iOS取得先は新配信確認まで旧URLを維持。手順・切替対象は[MAC_MIGRATION.md](MAC_MIGRATION.md)。
-=======
+Mac移行（2026-10-14）: 原本コピー・ZIP照合・Obsidian起動完了をユーザー確認済み。390記事の同期を保持し、GitHubをlearnleafへ改名。Mac検証3コミットと最新mainを統合し、iOS取得先と現行公開URLをLearnleafへ変更。インストール済みiOSアプリは別途更新が必要。詳細は[MAC_MIGRATION.md](MAC_MIGRATION.md)。
 未解決（2026-10-08）: Vault同期チェックが `docs/wiki/anken/anken001/20261001-145031.md` の「同期先を直接変更しているため上書きしません」で停止。原因は未特定。10/6〜10/8の個人開発メモはVault保存済みだがStudy Appへ未同期。ユーザー指示で課題として記録し、修正・同期・公開は保留。詳細は[sessions/2026-10-08-vault-sync-issue.md](sessions/2026-10-08-vault-sync-issue.md)。
 
 統合学習機能の設計（2026-10-08）: SVG図解・プレゼンテーション・Office/PDF資料を既存Study Appへ統合する調査と10本の設計書を[design/integrated-learning](design/integrated-learning/README.md)へ追加。状態は提案、実装未着手。添付配信基盤と安定リソースID、ローカルOffice変換、Web/iOSの共通配信を推奨。公開/private境界、iOS viewer、変換環境と実機上限は実装前の判断事項。現行アーキテクチャ・依存・公開記事は変更しない。
->>>>>>> origin/main
