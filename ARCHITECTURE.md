@@ -1,6 +1,17 @@
 # アーキテクチャ
 
-更新: 2026-10-02
+更新: 2026-10-08
+
+## iOSの図解・資料・スライド
+
+Files → VisualResourceStore(actor) → Application Support/StudyApp/visual-resources（索引JSON、UUID/hash原本、派生PDF・サムネイル）。VisualResourceModelがUIに供給する。記事IDで既存一覧と関連付け、資料UUIDとスライドIDは独立する。公開記事・音声・StudyBackupと保存形式を共有しない。
+
+- VisualResources / OfficeValidation / SafeSVG: metadata・容量・ZIP/XML・静的SVG検証。
+- SVGViewer / DocumentViewer: JSを無効化したWKWebView、PDFKit、Quick Look。PPTXは利用者が別途作成したPDFを登録する。
+- VisualSlides / VisualExports: Markdown構造分割、草稿編集・更新比較、ネイティブプレゼン、SVG/PNG/PDF/ZIPのローカル出力。
+- VisualLibraryView / SearchView / StudyApp: 資料一覧・分類・記事/要素関連、既存検索と記事末尾・設定からの導線。
+
+記事内SVGの遠隔取得は既存Pages配信元に限定し、リダイレクトを拒否して受信量を制限する。個人資料のクラウド同期や公開manifestは追加しない。方式の判断は[ADR-018](decisions/ADR-018-ios-local-visual-resources.md)、操作・制限・未検証事項は[iOS手順書](ios/VISUAL_RESOURCES.md)。
 
 ```text
 Obsidian Vault / wiki
@@ -42,7 +53,7 @@ Astro・OpenAI Sites・Codex CLIによる公開経路は現行構成にない。
 - `ios/Sources/ArticleClient.swift`: 専用一覧v1の検証、HTTPS取得、リダイレクト拒否、15秒の要求Timeout、最大3回の限定Retry、本文hash照合。
 - `ios/Sources/ArticleLinks.swift`: Frontmatter除去、コード内を除くWiki Link変換、一覧内のID・path・title・alias解決。
 - `ios/Sources/StudyStore.swift`: 独立した記録JSONのatomic保存、復元検証、monotonic uptimeでの計測区間。
-- `ios/Sources/StudyApp.swift`: 一覧・検索・フォルダ・本文・履歴・設定、画面とアプリ状態による計測制御。本文はMarkdownUI。下部タブは記事・聴く・検索・フォルダ・設定で、履歴は設定のNavigationStack内で開く。
+- `ios/Sources/StudyApp.swift`: 一覧・検索・フォルダ・本文・履歴・設定、画面とアプリ状態による計測制御。本文はMarkdownUI。下部タブは記事・聴く・見る・フォルダ・設定。検索は記事ホーム内のsheetで、履歴は設定のNavigationStack内で開く。
 - `ios/Sources/AudioLibrary.swift`: 許可された制作物フォルダをbookmarkで保持し、起動/アクティブ復帰/手動操作で同期。管理JSONのarticleID/trackIDで自動紐付けと差し替えを行い、playlistIDとtrackIDsの番組一覧も同期する。Application Supportへコピーし、音声一覧と位置をatomic保存。学習記録バックアップとは独立。
 - `ios/Sources/TrackPlayer.swift`: AVAudioPlayerでナレーションとBGMを再生。倍速、位置保存、AudioSessionとMediaPlayerによるバックグラウンド・ロック画面操作、割り込み停止。
 - `ios/Sources/AudioView.swift`: 番組タイルと音声を統合したListeningHome、管理用番組一覧/詳細、専用再生画面、聴く/番組のミニプレイヤー、設定内の音声取り込みを担当。記事からは再生画面を直接開き、別の記事の音声なら再生を開始する。入力形式はios/AUDIO_IMPORT.md。
