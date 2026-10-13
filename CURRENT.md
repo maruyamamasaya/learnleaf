@@ -123,3 +123,5 @@ Mac移行（2026-10-14）: 原本コピー・ZIP照合・Obsidian起動完了を
 未解決（2026-10-08）: Vault同期チェックが `docs/wiki/anken/anken001/20261001-145031.md` の「同期先を直接変更しているため上書きしません」で停止。原因は未特定。10/6〜10/8の個人開発メモはVault保存済みだがStudy Appへ未同期。ユーザー指示で課題として記録し、修正・同期・公開は保留。詳細は[sessions/2026-10-08-vault-sync-issue.md](sessions/2026-10-08-vault-sync-issue.md)。
 
 統合学習機能の設計（2026-10-08）: SVG図解・プレゼンテーション・Office/PDF資料を既存Study Appへ統合する調査と10本の設計書を[design/integrated-learning](design/integrated-learning/README.md)へ追加。状態は提案、実装未着手。添付配信基盤と安定リソースID、ローカルOffice変換、Web/iOSの共通配信を推奨。公開/private境界、iOS viewer、変換環境と実機上限は実装前の判断事項。現行アーキテクチャ・依存・公開記事は変更しない。
+
+Learnleaf公開（2026-10-14）: mainへの通常pushとPages Actions run 38419163491成功。新URLの390記事でHTTP取得・全本文hash一致、公開catalog revisionもローカルと一致。Web24件・iOSビルド/55件XCTest成功。端末内のiOSアプリは新URL版への更新が別途必要。
