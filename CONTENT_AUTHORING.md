@@ -2,7 +2,7 @@
 
 ## 編集
 
-記事はObsidian Vaultの`wiki/`で編集します。`docs/`は生成ミラーなので直接編集しません。Vaultは既定でStudy Appの隣の`Document organization`です。
+記事はObsidian Vaultの`wiki/`で編集します。`docs/`は生成ミラーなので直接編集しません。Macの原本Vaultは`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Learnleaf`です。Mac用スクリプトが`STUDY_APP_VAULT`を設定します。直接CLIを実行する場合もこの環境変数かVault引数を指定してください。環境変数・引数を省略したprepareの既定値は旧`../Document organization`のままです。移行中の制約は[MAC_MIGRATION.md](MAC_MIGRATION.md)を参照してください。
 
 ID、filename、created、type、tagsのFrontmatterは現在のObsidianテンプレートを使います。IDを変更しないでください。
 
@@ -10,7 +10,7 @@ ID、filename、created、type、tagsのFrontmatterは現在のObsidianテンプ
 
 ## 一括更新
 
-`sync-and-publish.cmd`をダブルクリックします。コマンドからは次のとおりです。
+Windowsでは`sync-and-publish.cmd`、Macでは`sync-and-publish.command`を使います。Macの起動確認は`start-learnleaf.command`で既存docsを配信します（同期なし）。Macの公開スクリプトは原本照合完了の明示がない限り停止します。コマンドからは次のとおりです。
 
 ```powershell
 npm run vault:publish

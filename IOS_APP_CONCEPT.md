@@ -60,13 +60,13 @@ HTTPSは通信方式、Gitは変更履歴を管理・同期する仕組みであ
 配信元の基準URLは次のとおり。
 
 ```text
-https://maruyamamasaya.github.io/studyApp/
+https://maruyamamasaya.github.io/learnleaf/
 ```
 
 現行の記事metadataは次のURLで配信される。
 
 ```text
-https://maruyamamasaya.github.io/studyApp/_article-metadata.json
+https://maruyamamasaya.github.io/learnleaf/_article-metadata.json
 ```
 
 実装を確認した時点で、このJSONは記事オブジェクトの配列で、id、path、filename、title、displayTitle、type、tags、aliases、createdなどを持つ。Schemaの版番号と本文hashは含まれていない。
@@ -74,7 +74,7 @@ https://maruyamamasaya.github.io/studyApp/_article-metadata.json
 本文の取得URLの例は次のとおり。
 
 ```text
-https://maruyamamasaya.github.io/studyApp/wiki/anken001/20261001-171535.md
+https://maruyamamasaya.github.io/learnleaf/wiki/anken001/20261001-171535.md
 ```
 
 Web画面のURLにある`#/wiki/...`はDocsifyの画面切り替え用である。iOSの本文取得では、hash routeを使わず、実ファイルのURLを使う。

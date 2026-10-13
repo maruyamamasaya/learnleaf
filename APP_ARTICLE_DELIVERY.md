@@ -11,13 +11,13 @@
 公開後のサイト基準URL:
 
 ```text
-https://maruyamamasaya.github.io/studyApp/
+https://maruyamamasaya.github.io/learnleaf/
 ```
 
 公開後の一覧URL:
 
 ```text
-https://maruyamamasaya.github.io/studyApp/app-articles.v1.json
+https://maruyamamasaya.github.io/learnleaf/app-articles.v1.json
 ```
 
 Markdownは一覧のpathを基準URLへ結合して取得する。pathはサイトルート相対であり、JSONファイルの文字列へ単純に付け足さない。Docsify用の`#/...`を含む画面URLは使用しない。
@@ -25,7 +25,7 @@ Markdownは一覧のpathを基準URLへ結合して取得する。pathはサイ�
 本文URLの例:
 
 ```text
-https://maruyamamasaya.github.io/studyApp/wiki/anken001/20261001-171535.md
+https://maruyamamasaya.github.io/learnleaf/wiki/anken001/20261001-171535.md
 ```
 
 GitHubのAPIやGit clone/pullは使わず、公開ファイルを読む。GitHub Token、APIキー、ログインは不要。配信内容は一般公開であり、個人用アプリから利用しても非公開にはならない。
@@ -134,7 +134,7 @@ npm run app:verify -- http://127.0.0.1:8000/
 新しいファイルを公開した後の検証:
 
 ```powershell
-npm run app:verify -- https://maruyamamasaya.github.io/studyApp/
+npm run app:verify -- https://maruyamamasaya.github.io/learnleaf/
 ```
 
 app:verifyは読取専用。全記事を順番に取得し、一覧の形式、HTTP成功、本文hashを確認する。本文ごとの詳細ログは成功時に出さず、失敗時には対象と原因を表示して非0で終了する。各要求は15秒まで待ち、全記事の取得を含むため総時間は記事数に依存する。

@@ -33,7 +33,7 @@ final class StudyAppTests: XCTestCase {
         let url = try ArticleClient.url(for: "wiki/日本語 #%.md")
         XCTAssertNil(url.fragment)
         XCTAssertNil(url.query)
-        XCTAssertEqual(url.path, "/studyApp/wiki/日本語 #%.md")
+        XCTAssertEqual(url.path, "/learnleaf/wiki/日本語 #%.md")
     }
     func testCatalogRejectsDuplicatesAndSchema() {
         let a = article()

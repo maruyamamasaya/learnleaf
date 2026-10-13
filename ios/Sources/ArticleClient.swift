@@ -66,7 +66,7 @@ protocol ArticleProviding {
 }
 
 final class ArticleClient: ArticleProviding {
-    static let baseURL = URL(string: "https://maruyamamasaya.github.io/studyApp/")!
+    static let baseURL = URL(string: "https://maruyamamasaya.github.io/learnleaf/")!
     private let delegate = NoRedirect()
     private lazy var session: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral

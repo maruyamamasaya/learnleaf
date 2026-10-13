@@ -15,7 +15,7 @@ SwiftUI、iOS 17以降を対象とする。記事はPagesの `app-articles.v1.js
 ## Macでの開始手順
 
 1. この作業を含むリポジトリをMacへコピーするか、commit/push後に取得する。現在の未commitファイルはcloneだけでは取得できない。
-2. 配信ファイルを公開する。リポジトリルートで通常の `npm run vault:publish` を実行し、Pagesのdeploy成功後に `npm run app:verify -- https://maruyamamasaya.github.io/studyApp/` を確認する。MacにVaultがない場合はWindows側で公開する。
+2. 配信ファイルを公開する。リポジトリルートで通常の `npm run vault:publish` を実行し、Pagesのdeploy成功後に `npm run app:verify -- https://maruyamamasaya.github.io/learnleaf/` を確認する。MacにVaultがない場合はWindows側で公開する。
 3. MacにXcodeとcommand line toolsを準備する。Homebrewを使う場合は `brew install xcodegen` でXcodeGenを導入する。
 4. Macのターミナルで以下を実行する。
 

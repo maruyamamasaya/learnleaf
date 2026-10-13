@@ -8,7 +8,7 @@
 - 保存フォルダと記事種別は独立。`wiki/anken001/`内の`type: study`も原本どおり同期し、研修一覧に掲載する。
 - `npm run vault:prepare`で同期・索引生成・テスト。`sync-and-publish.cmd`または`npm run vault:publish`でその後GitHubへのcommit/pushを行う。Codex・AIは使用しない。
 - 日常の同期・公開は成功時の要約のみ表示し、記事の末尾空白では停止しない。Frontmatter/ID/上書き保護とテストは維持。詳細ログは`--verbose`。
-- 公開先はGitHub Pages。ユーザーはサイト・repository・Git履歴の公開を承認した。repositoryをpublicへ変更し、PagesをGitHub Actions方式で設定済み。URLは https://maruyamamasaya.github.io/studyApp/ 。
+- 公開先はGitHub Pages。ユーザーはサイト・repository・Git履歴の公開を承認した。repositoryをpublicへ変更し、PagesをGitHub Actions方式で設定済み。URLは https://maruyamamasaya.github.io/learnleaf/ 。
 - Astro実装、dist、contentミラー、generated、Sites設定、Codex CLI公開処理と不要な依存を削除した。旧設計判断と作業履歴はdecisions/・sessions/に保存する。
 - `.github/workflows/pages.yml`がmainへのpush後、docsを静的配信する。公開結果はActionsで確認し、push成功だけをdeploy成功と扱わない。
 - 公開サイトにはログイン制限を設けない。旧クライアント側password gateは認証ではないため現行公開サイトから除去した。
@@ -115,3 +115,5 @@ Learnleafロードマップ段階1〜5（2026-10-06）: ユーザー指示で段
 最新main取込（2026-10-06）: 取得済みorigin/main（a8d523a）へ更新し、公開記事・取込記録の匿名化と自由なtype対応をローカルのLearnleafロードマップ版へ統合。実機導入は上記22:29の記録を参照。自由なtypeの記事表示・本文の実機手動確認は引き続き残る。
 
 リモート反映（2026-10-07）: ユーザー承認で統合済みLearnleaf変更をmainへcommit/pushする。前回のWeb24件・iOS51件成功を確認。公開記事の差分はなく、Pagesの自動deploy対象外。実機手動確認の残課題は継続。
+
+Mac移行（2026-10-13）: `codex/learnleaf-mac-migration`で名称統一を準備。開発コードは`~/Development/learnleaf`、原本VaultをiCloud Obsidianの`Learnleaf`へ名前変更し、既存7ファイルの退避・hash一致を確認。Windows原本ZIP未受領、wikiなしのため同期・記事削除・公開は禁止。Mac用起動/公開スクリプトを追加。GitHubの目標は`maruyamamasaya/learnleaf`だがリモート改名・origin変更は未実施。iOS取得先は新配信確認まで旧URLを維持。手順・切替対象は[MAC_MIGRATION.md](MAC_MIGRATION.md)。

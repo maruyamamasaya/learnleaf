@@ -88,3 +88,7 @@ Astro・OpenAI Sites・Codex CLIによる公開経路は現行構成にない。
 - ピックアップ対象の単一タグはUserDefaults。カードの長押しで保存sheetを開け、新規コレクションの作成と記事追加は一回のatomic記録保存で確定。
 - OfflineArticles actorはApplication Support/StudyApp/offlineに検証済みcatalogとhash名の本文をatomic保存。読取時もcatalog/path/hashを検証。Libraryはメモリ→同hashの端末本文→HTTPSの順で取得し、通信不可の起動時のみ保存catalogへfallback。JSON/hash不正をofflineで隠さない。全記事保存は明示操作・取消・失敗件数付き。保存容量は旧版本文も含む全体、保存記事数は現在catalogの同hashだけを数える。削除は記録/音声を保持し取得中は拒否。
 - StudyRecordMergeは既存v1 JSONを検証して学習区間IDをunion。同一IDの異なる区間は統合を拒否。読了はOR、最終閲覧は新しい日時、お気に入りとcollection articleIDsはunion、同collection名はローカル優先。削除の伝播や自動iCloud同期は行わない。明示確認後に現在記録へatomic保存。
+
+## Macの起動と移行中の公開制御
+
+`start-learnleaf.command`は既存docsのHTTP配信のみ、`sync-and-publish.command`は公開CLIを起動する。両者はMacのLearnleaf Vaultを`STUDY_APP_VAULT`の既定値として設定する。公開用は原本照合完了の明示環境変数とwikiの存在を確認してからCLIへ渡す。公開CLIはlearnleafのoriginだけを許可する。移行中の実際のリモート・配信URLと未完了事項はMAC_MIGRATION.mdに記載。
