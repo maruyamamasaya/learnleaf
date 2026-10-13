@@ -32,7 +32,7 @@ final class VisualResourceTests: XCTestCase {
         try archive.addEntry(with: "[Content_Types].xml", type: .file, uncompressedSize: Int64(xml.count)) { position, size in
             xml.subdata(in: Int(position)..<Int(position) + size)
         }
-        try archive.addEntry(with: "word/document.xml", type: .file, uncompressedSize: 4) { _, _ in Data("<w/>".utf8) }
+        try archive.addEntry(with: "word/document.xml", type: .file, uncompressedSize: Int64(4)) { _, _ in Data("<w/>".utf8) }
         XCTAssertThrowsError(try ResourceValidation.validateOffice(archive.data!, kind: .docx))
     }
     func testImportRestartHashReplacementAndCorruptIndexProtection() async throws {

@@ -121,12 +121,12 @@ struct PresentationKeys: UIViewControllerRepresentable {
     let previous: () -> Void
     let next: () -> Void
     func makeUIViewController(context: Context) -> Controller { Controller(previous: previous, next: next) }
-    func updateUIViewController(_ controller: Controller, context: Context) { controller.previous = previous; controller.next = next }
+    func updateUIViewController(_ controller: Controller, context: Context) { controller.previous = previous; controller.advanceSlide = next }
     final class Controller: UIViewController {
         var previous: () -> Void
-        var next: () -> Void
+        var advanceSlide: () -> Void
         init(previous: @escaping () -> Void, next: @escaping () -> Void) {
-            self.previous = previous; self.next = next; super.init(nibName: nil, bundle: nil)
+            self.previous = previous; self.advanceSlide = next; super.init(nibName: nil, bundle: nil)
         }
         required init?(coder: NSCoder) { nil }
         override var canBecomeFirstResponder: Bool { true }
@@ -137,7 +137,7 @@ struct PresentationKeys: UIViewControllerRepresentable {
              UIKeyCommand(input: " ", modifierFlags: [], action: #selector(forward))]
         }
         @objc private func back() { previous() }
-        @objc private func forward() { next() }
+        @objc private func forward() { advanceSlide() }
     }
 }
 @MainActor struct DeckEditor: View {
