@@ -125,3 +125,5 @@ Mac移行（2026-10-14）: 原本コピー・ZIP照合・Obsidian起動完了を
 統合学習機能の設計（2026-10-08）: SVG図解・プレゼンテーション・Office/PDF資料を既存Study Appへ統合する調査と10本の設計書を[design/integrated-learning](design/integrated-learning/README.md)へ追加。状態は提案、実装未着手。添付配信基盤と安定リソースID、ローカルOffice変換、Web/iOSの共通配信を推奨。公開/private境界、iOS viewer、変換環境と実機上限は実装前の判断事項。現行アーキテクチャ・依存・公開記事は変更しない。
 
 Learnleaf公開（2026-10-14）: mainへの通常pushとPages Actions run 38419163491成功。新URLの390記事でHTTP取得・全本文hash一致、公開catalog revisionもローカルと一致。Web24件・iOSビルド/55件XCTest成功。端末内のiOSアプリは新URL版への更新が別途必要。
+
+iOS新URL版の実機更新（2026-10-14）: Vesperaへ既存Team・同bundle IDで署名ビルド、上書き導入・起動成功。更新前後のrecords.v1.jsonはSHA-256完全一致。起動後の端末catalogは390記事で公開/ローカルrevisionと一致。新URL版への端末更新は完了。詳細はsessions/2026-10-14-ios-device-update.md。実機の読書・音声・資料機能の手動評価は継続。
