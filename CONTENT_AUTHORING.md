@@ -2,7 +2,7 @@
 
 ## 編集
 
-記事はObsidian Vaultの`wiki/`で編集します。`docs/`は生成ミラーなので直接編集しません。Macの原本Vaultは`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Learnleaf`です。Mac用スクリプトが`STUDY_APP_VAULT`を設定します。直接CLIを実行する場合もこの環境変数かVault引数を指定してください。環境変数・引数を省略したprepareの既定値は旧`../Document organization`のままです。移行中の制約は[MAC_MIGRATION.md](MAC_MIGRATION.md)を参照してください。
+記事はObsidian Vaultの`wiki/`で編集します。`docs/`は生成ミラーなので直接編集しません。Macの原本Vaultは`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Learnleaf`です。Mac用スクリプトが`STUDY_APP_VAULT`を設定します。直接CLIを実行する場合もこの環境変数かVault引数を指定してください。環境変数・引数を省略したprepareの既定値は旧`../Document organization`のままです。Macの配置・起動・公開手順は[MAC_MIGRATION.md](MAC_MIGRATION.md)を参照してください。
 
 ID、filename、created、type、tagsのFrontmatterは現在のObsidianテンプレートを使います。IDを変更しないでください。
 

@@ -1,6 +1,6 @@
 # Learnleaf 図解・資料・プレゼン
 
-更新: 2026-10-08。iOS向け実装記録。ビルド、XCTest、Simulator、実機操作はユーザー指定により別途実施する。以下は実装内容であり、動作検証済みの保証ではない。
+更新: 2026-10-14。iOS向け実装記録。この機能を含むMacビルド・55件XCTest、Vesperaへの導入・起動は成功。資料機能の画面上の操作、Files/iCloud、描画・共有・性能の実機受入は未実施。証跡は[公開検証記録](../sessions/2026-10-14-learnleaf-publication.md)と[実機更新記録](../sessions/2026-10-14-ios-device-update.md)。
 
 ## 操作
 

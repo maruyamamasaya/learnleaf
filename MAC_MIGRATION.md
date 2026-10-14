@@ -24,6 +24,6 @@ iOSのArticleClientと現行配信文書も新URLを使用する。旧URLリダ�
 
 ## 検証と残課題
 
-最終検証結果・公開Actions・390記事のHTTP/hash検証はsessions/2026-10-14-learnleaf-publication.mdに記録する。
+最終検証結果・公開Actions・390記事のHTTP/hash検証は[公開検証記録](sessions/2026-10-14-learnleaf-publication.md)を参照する。
 
-インストール済みiOSアプリの取得先はWeb公開では更新されない。新取得先を含むアプリの別途ビルド・端末更新が必要。
+Vesperaのインストール済みiOSアプリは2026-10-14に新取得先を含む版へ上書き更新・起動済み。学習記録の保持と390記事の端末catalog一致を確認した。証跡は[実機更新記録](sessions/2026-10-14-ios-device-update.md)。実機での読書・音声・資料操作の手動確認は残る。

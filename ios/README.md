@@ -2,11 +2,11 @@
 
 # iOSアプリの開発とMacでの確認
 
-Windowsで作成した初期実装を2026-10-02にMacで検証。Xcode 26.6でSimulatorの23件XCTestが成功し、Vespera（iPhone 17e）への開発署名付きビルド・インストール・起動を確認した。読書・音声の手動確認は以下の項目が残る。
+2026-10-14にMacで現行版のビルドと55件XCTestが成功。Vespera（iPhone 17e）へ新Pages URL版を同bundle IDで上書き更新し、起動・学習記録の保持・390記事の端末catalog一致を確認した。証跡は[公開検証記録](../sessions/2026-10-14-learnleaf-publication.md)と[実機更新記録](../sessions/2026-10-14-ios-device-update.md)。読書・音声・資料の画面上の操作確認は以下の項目が残る。
 
 ## 図解・資料・プレゼン
 
-2026-10-08にiOS実装を追加。[操作・対応フェーズ・制限・受入確認](VISUAL_RESOURCES.md)を参照する。この変更のビルド、テスト、実機確認はユーザー指定で別途実施する。過去の検証結果は今回の変更を含まない。project.ymlへZIPFoundationを追加したためMacではXcodeGen再生成とSPM解決が必要。
+2026-10-08にiOS実装を追加。[操作・対応フェーズ・制限・受入確認](VISUAL_RESOURCES.md)を参照する。この変更を含むビルド・55件XCTestと実機への導入・起動は2026-10-14に成功。資料機能の実機操作確認は残る。project.ymlへZIPFoundationを追加したためMacではXcodeGen再生成とSPM解決が必要。
 
 ## 構成
 
@@ -18,7 +18,7 @@ SwiftUI、iOS 17以降を対象とする。記事はPagesの `app-articles.v1.js
 
 ## Macでの開始手順
 
-1. この作業を含むリポジトリをMacへコピーするか、commit/push後に取得する。現在の未commitファイルはcloneだけでは取得できない。
+1. この作業を含むリポジトリをMacへコピーするか、commit/push後に取得する。未commitファイルがある場合はcloneだけでは取得できない。
 2. 配信ファイルを公開する。リポジトリルートで通常の `npm run vault:publish` を実行し、Pagesのdeploy成功後に `npm run app:verify -- https://maruyamamasaya.github.io/learnleaf/` を確認する。MacにVaultがない場合はWindows側で公開する。
 3. MacにXcodeとcommand line toolsを準備する。Homebrewを使う場合は `brew install xcodegen` でXcodeGenを導入する。
 4. Macのターミナルで以下を実行する。
@@ -29,7 +29,7 @@ xcodegen generate
 open StudyApp.xcodeproj
 ```
 
-XcodeでStudyApp schemeと利用可能なiPhone Simulatorを選び、Runする。実機ではSigning & Capabilitiesから自分のTeamを選ぶ。Bundle Identifierが競合する場合は `project.yml` の値を変更して再生成する。Appleアカウントの資格情報をリポジトリへ保存しない。
+XcodeでStudyApp schemeと利用可能なiPhone Simulatorを選び、Runする。実機ではSigning & Capabilitiesから自分のTeamを選ぶ。既存アプリを更新するときは同じTeamとBundle Identifierを維持する。新規の別アプリとして作る場合だけ、識別子の競合を確認する。Appleアカウントの資格情報をリポジトリへ保存しない。
 
 ## 自動テスト
 
@@ -100,7 +100,7 @@ JSON出力、取得の成否、実行日時、使用した通常端末のUDID、
 
 ## 手動確認
 
-- 自由なtypeに対応した版への更新後、Applied・development-log・未指定の記事が一覧に表示され、本文を開けること。旧版は許可リストにない種別を拒否して一覧全体の形式エラーになる。Webの再公開だけでは端末内の検証処理は更新されない。
+- 自由なtype対応版はVesperaへ更新済み。Applied・development-log・未指定の記事が実機画面の一覧に表示され、本文を開けることを確認する。旧版は許可リストにない種別を拒否して一覧全体の形式エラーになる。Webの再公開だけでは端末内の検証処理は更新されない。
 
 - 日本語の長い記事、表、コード、ダークモード、文字サイズ、VoiceOver。
 - 検索、フォルダ、未読了絞り込み、引っ張って一覧更新。
@@ -110,25 +110,25 @@ JSON出力、取得の成否、実行日時、使用した通常端末のUDID、
 - 再起動後の読了と時間、JSON書き出し・復元キャンセル・復元、壊れたバックアップの拒否。
 - 記事移動でも同じIDの記録が維持され、記事削除後も履歴が残ること。
 
-## 初期実装の制限
+## 現行の制限
 
-見出しリンクは記事の先頭を開く。見出しへのスクロール、Vaultからの添付同期、日別集計と日付またぎの配分、復習モード、クラウド同期は未実装。履歴は設定の「学習記録」から開く。記事ごとに合計時間を表示し、最新の学習順に並べる。下部タブは記事・聴く・検索・フォルダ・設定。本文の埋め込みHTMLと画像の描画はMacで検証する。任意JavaScriptを実行するWebViewは使用しない。
+見出しリンクは記事の先頭を開く。見出しへのスクロール、Vaultからの添付同期、日別集計と日付またぎの配分、復習モード、クラウド同期は未実装。履歴は設定の「学習記録」から開く。記事ごとに合計時間を表示し、最新の学習順に並べる。下部タブは記事・聴く・見る・フォルダ・設定。検索は記事ホーム内から開く。本文の埋め込みHTMLと画像の描画はMacで検証する。任意JavaScriptを実行するWebViewは使用しない。
 
-時間はmonotonic uptimeで測り30秒ごとに保存する。OSが保存の機会なくアプリを終了した場合、最後の未保存区間は最大約30秒失われ得る。アプリのバックアップ復元中は計測中の記事を開かない。WindowsではSwiftツールチェーンを導入していないため、ビルド成功・テスト成功を判定できていない。
+時間はmonotonic uptimeで測り30秒ごとに保存する。OSが保存の機会なくアプリを終了した場合、最後の未保存区間は最大約30秒失われ得る。アプリのバックアップ復元中は計測中の記事を開かない。iOSのビルド・テストはMacで実施する。
 
 ## 事前生成音声
 
-設定の「音声・同期」から、iCloud Drive等の制作物フォルダとBGMを取り込める。「聴く」は番組と音声をまとめて表示し、「管理」から番組一覧と再生順・曲間の設定へ進む。記事の「この記事を聴く」は再生ページを直接開く。聴く/番組の下部のミニプレイヤーから再生ページを開き直せる。フォルダ同期と管理JSONによる自動紐付け、同じtrackIDの差し替えと台本の取り込み、端末内コピーの再生、位置保存、倍速、BGM、バックグラウンドとロック画面の操作を実装した。生成処理は追加していない。受け入れ形式と実機確認は[AUDIO_IMPORT.md](AUDIO_IMPORT.md)を参照する。XcodeGenを再生成し、Background Audio設定を反映してから確認する。
+設定の「音声・同期」から、iCloud Drive等の制作物フォルダとBGMを取り込める。「聴く」は番組と音声をまとめて表示し、「管理」から番組一覧と再生順・曲間の設定へ進む。記事の「この記事を聴く」は再生ページを直接開く。各タブの下部のミニプレイヤーから再生ページを開き直せる。フォルダ同期と管理JSONによる自動紐付け、同じtrackIDの差し替えと台本の取り込み、端末内コピーの再生、位置保存、倍速、BGM、バックグラウンドとロック画面の操作を実装した。生成処理は追加していない。受け入れ形式と実機確認は[AUDIO_IMPORT.md](AUDIO_IMPORT.md)を参照する。XcodeGenを再生成し、Background Audio設定を反映してから確認する。
 
 ## 学習番組
 
-番組の再生順、連続再生、0〜10秒のインターバル、BGM、最後の番組の途中再開を追加した。制作側の番組JSONとMacでの確認手順は[RADIO_PLAYBACK.md](RADIO_PLAYBACK.md)。ビルド・23件のXCTestはMacで成功。音声の実機操作は手動確認が残る。
+番組の再生順、連続再生、0〜10秒のインターバル、BGM、最後の番組の途中再開を追加した。制作側の番組JSONとMacでの確認手順は[RADIO_PLAYBACK.md](RADIO_PLAYBACK.md)。現行版のビルド・55件XCTestはMacで成功。音声の実機操作は手動確認が残る。
 
 ## アイコンと実機ビルド
 
 抽象的な青緑・紫のアイコンをResources/Assets.xcassetsに配置した。XcodeGen再生成で反映する。署名TeamはXcodeまたはxcodebuildのDEVELOPMENT_TEAMでローカル指定する。共有project.ymlには個人Teamを保存しない。
 
-Macの既定Nodeが16の場合、既存テストとHTTP配信検証にはNode 18以降を選択する。今回はHomebrewのNode 24を使用した。公開一覧の54記事すべての取得と本文hash一致を確認済み。
+Macの既存テストとHTTP配信検証は`/opt/homebrew/opt/node@24/bin`をPATHの先頭にして実行する。2026-10-14に公開一覧の390記事すべてのHTTP取得と本文hash一致を確認済み。
 
 ## 記事を探す・保存する
 
