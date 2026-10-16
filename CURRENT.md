@@ -1,6 +1,6 @@
 # 現在の状態
 
-更新: 2026-10-14
+更新: 2026-10-16
 
 ## 配置と公開
 
@@ -11,6 +11,8 @@
 - 公開URLは https://maruyamamasaya.github.io/learnleaf/ 。ルートと研修サイトはHTTP 200を確認済み。閲覧制限は設けず、旧クライアント側password gateは認証として使用しない。
 
 ## 日常の編集・同期
+
+- 開発メモのVault自動保存はMacのheartbeat `obsidian-mac`（開発メモをObsidianへ保存（Mac））を有効化。毎日09:15 JST目安で実出力と過去の未保存分を照合する。Windows側`obsidian`は変更せず停止を維持。10/14〜10/16分をMac原本へ保存・再読確認済み。初回heartbeatで10/16分の取得・承認付き書込が成功。Mac/Codex起動とVault書込権限が必要。これは保存のみで同期・公開は行わない。詳細は[sessions記録](sessions/2026-10-16-obsidian-mac-automation.md)。
 
 - 編集はVaultで行い、docsを直接編集しない。`npm run vault:prepare`で同期・索引生成・テストを行う。公開はMacの`sync-and-publish.command`、Windowsの`sync-and-publish.cmd`または`npm run vault:publish`を使う。
 - Macの`start-learnleaf.command`は既存docsのローカルHTTP配信のみ。両MacスクリプトはLearnleaf Vaultを既定値とし、Nodeは`/opt/homebrew/opt/node@24/bin`を優先する。
