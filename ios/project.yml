@@ -48,6 +48,16 @@ targets:
       base:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: jp.maruyama.studyapp.tests
+  StudyAppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: StudyApp
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: jp.maruyama.studyapp.uitests
 schemes:
   StudyApp:
     build:
@@ -55,3 +65,9 @@ schemes:
         StudyApp: all
     test:
       targets: [StudyAppTests]
+  StudyAppDeviceAcceptance:
+    build:
+      targets:
+        StudyApp: all
+    test:
+      targets: [StudyAppUITests]

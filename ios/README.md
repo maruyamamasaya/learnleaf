@@ -62,6 +62,12 @@ bash ios/scripts/verify-mac.sh SIMULATOR_ID StudyAppTests/Class/testMethod
 
 実行後の記録はスクリプト終了時点の情報であり、子プロセス終了や複製の所有を保証しない。中断時を含め、以下の運用ルールに従って確認と清掃を行う。スクリプトは端末を削除しない。音声の実機確認は[AUDIO_IMPORT.md](AUDIO_IMPORT.md)と[RADIO_PLAYBACK.md](RADIO_PLAYBACK.md)を参照する。
 
+### 実機UIの受入確認
+
+`StudyAppDeviceAcceptance` schemeと`StudyAppUITests`を通常の単体テストから分けている。Vesperaの既存記事・音声を使う実機操作用で、空のSimulator用テストではない。対象端末を明示し、同じTeam/bundle IDを維持して署名する。Xcodeから同schemeを選び、ロック解除済みの実機で実行する。
+
+実行前にアプリデータを退避する。記事操作は閲覧記録・学習時間、音声操作は再生位置を更新し、資料確認は記事からスライドを作成する。既存ユーザーデータをリセットしない。スクリーンショットと画面階層はxcresultに保存する。2026-10-17は入口確認1件が成功し、本文・再生・スライド確認は端末ロックで未実行。詳細は[実機受入記録](../sessions/2026-10-17-device-acceptance.md)。
+
 ### Simulator運用ルール
 
 Simulator上の単体・回帰・UIテストすべてに適用する。清掃は実行した開発エージェントが行う。自動清掃スクリプトは導入しない。
