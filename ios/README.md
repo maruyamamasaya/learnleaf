@@ -2,11 +2,11 @@
 
 # iOSアプリの開発とMacでの確認
 
-2026-10-14にMacで現行版のビルドと55件XCTestが成功。Vespera（iPhone 17e）へ新Pages URL版を同bundle IDで上書き更新し、起動・学習記録の保持・390記事の端末catalog一致を確認した。証跡は[公開検証記録](../sessions/2026-10-14-learnleaf-publication.md)と[実機更新記録](../sessions/2026-10-14-ios-device-update.md)。読書・音声・資料の画面上の操作確認は以下の項目が残る。
+2026-10-17に現行版の実機ビルドと57件XCTestが成功。Vespera（iPhone 17e）へ新Pages URL版を同bundle IDで上書き更新し、起動・学習記録の保持・390記事の端末catalog一致を確認した。証跡は[公開検証記録](../sessions/2026-10-14-learnleaf-publication.md)と[実機更新記録](../sessions/2026-10-14-ios-device-update.md)。読書・音声・資料の画面上の操作確認は以下の項目が残る。
 
 ## 図解・資料・プレゼン
 
-2026-10-08にiOS実装を追加。[操作・対応フェーズ・制限・受入確認](VISUAL_RESOURCES.md)を参照する。この変更を含むビルド・55件XCTestと実機への導入・起動は2026-10-14に成功。資料機能の実機操作確認は残る。project.ymlへZIPFoundationを追加したためMacではXcodeGen再生成とSPM解決が必要。
+2026-10-08にiOS実装を追加。[操作・対応フェーズ・制限・受入確認](VISUAL_RESOURCES.md)を参照する。この変更を含むビルド・57件XCTestに成功。2026-10-17にスライド作成/編集保存/PDF出力とPDFのFiles/iCloud取込/閲覧を実機で確認し、Word/PowerPoint/SVG等の実ファイル操作は残る。project.ymlへZIPFoundationを追加したためMacではXcodeGen再生成とSPM解決が必要。
 
 ## 構成
 
@@ -66,7 +66,9 @@ bash ios/scripts/verify-mac.sh SIMULATOR_ID StudyAppTests/Class/testMethod
 
 `StudyAppDeviceAcceptance` schemeと`StudyAppUITests`を通常の単体テストから分けている。Vesperaの既存記事・音声を使う実機操作用で、空のSimulator用テストではない。対象端末を明示し、同じTeam/bundle IDを維持して署名する。Xcodeから同schemeを選び、ロック解除済みの実機で実行する。
 
-実行前にアプリデータを退避する。記事操作は閲覧記録・学習時間、音声操作は再生位置を更新し、資料確認は記事からスライドを作成する。既存ユーザーデータをリセットしない。スクリーンショットと画面階層はxcresultに保存する。2026-10-17は入口確認1件が成功し、本文・再生・スライド確認は端末ロックで未実行。詳細は[実機受入記録](../sessions/2026-10-17-device-acceptance.md)。
+`testArticleAndPresentation`は公開記事「RAGとは」、音声テストは既存の「RAGとは・ずんだもんの入門解説」を使用する。PDFテストはiCloud Drive内の44ページの`Learnleaf-Acceptance-20261017.pdf`をFiles検索で選ぶため、同じ検証用PDFを事前配置する。今回の一時配置は検証後に削除済みなので、再実行前に再配置する。通常の単体テストにはこの実機データを必要としない。
+
+実行前にアプリデータを退避する。記事操作は閲覧記録・学習時間、音声操作は再生位置を更新し、資料確認は記事からスライドを作成し、UUID付きの確認用タイトルで保存した自作資料をテスト終了時に削除する。PDFテストも自分で取り込んだ検証用PDFを削除する。既存ユーザーデータをリセットしない。スクリーンショットと画面階層はxcresultに保存する。2026-10-17に本文表示・音声再生/一時停止/バックグラウンド復帰・スライド作成/編集/出力・PDF取り込み/閲覧を実機で確認。検索カードのタップ領域と空の自動継続スライドを修正し、単体テスト57件と最終UIテスト4件が成功。詳細は[実機受入記録](../sessions/2026-10-17-device-acceptance.md)。
 
 ### Simulator運用ルール
 
@@ -128,7 +130,7 @@ JSON出力、取得の成否、実行日時、使用した通常端末のUDID、
 
 ## 学習番組
 
-番組の再生順、連続再生、0〜10秒のインターバル、BGM、最後の番組の途中再開を追加した。制作側の番組JSONとMacでの確認手順は[RADIO_PLAYBACK.md](RADIO_PLAYBACK.md)。現行版のビルド・55件XCTestはMacで成功。音声の実機操作は手動確認が残る。
+番組の再生順、連続再生、0〜10秒のインターバル、BGM、最後の番組の途中再開を追加した。制作側の番組JSONとMacでの確認手順は[RADIO_PLAYBACK.md](RADIO_PLAYBACK.md)。現行版の実機ビルド・57件XCTestは成功。音声の実機操作は手動確認が残る。
 
 ## アイコンと実機ビルド
 

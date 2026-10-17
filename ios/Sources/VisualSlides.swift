@@ -8,9 +8,12 @@ enum SlideBuilder {
         var slides: [VisualSlide] = []
         var title = "はじめに", lines: [String] = []
         var fence: String?
+        var continuation = false
         func flush() {
             let text = lines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
-            if !text.isEmpty || title != "はじめに" { slides.append(VisualSlide(title: title, body: text)) }
+            if !text.isEmpty || (title != "はじめに" && !continuation) {
+                slides.append(VisualSlide(title: title, body: text))
+            }
             lines = []
         }
         for line in body.components(separatedBy: "\n") {
@@ -21,9 +24,9 @@ enum SlideBuilder {
                 if fence == marker { fence = nil } else if fence == nil { fence = marker }
                 lines.append(line); continue
             }
-            if fence == nil, trimmed == "---" { flush(); title = "続き"; continue }
+            if fence == nil, trimmed == "---" { flush(); title = "続き"; continuation = true; continue }
             if fence == nil, let match = trimmed.range(of: "^#{1,6}\\s+", options: .regularExpression) {
-                flush(); title = String(trimmed[match.upperBound...]); continue
+                flush(); title = String(trimmed[match.upperBound...]); continuation = false; continue
             }
             lines.append(line)
         }

@@ -160,6 +160,7 @@ private struct ArticlePickRequest: Equatable {
                     else if store.data.progress[article.id]?.lastViewedAt != nil { Text("途中") }
                 }.font(.caption).foregroundStyle(design.accent)
             }.padding(16).background { StudyTileSurface() }
+                .contentShape(RoundedRectangle(cornerRadius: design.radius))
         }.buttonStyle(.plain)
         .contextMenu {
             Button(store.isFavorite(article.id) ? "お気に入りを解除" : "お気に入りに保存", systemImage: "bookmark") { store.toggleFavorite(article.id) }

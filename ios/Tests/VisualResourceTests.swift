@@ -73,4 +73,15 @@ final class VisualResourceTests: XCTestCase {
         XCTAssertEqual(slides[0].body.contains("hello"), true)
         XCTAssertEqual(edited[0].body, "manual")
     }
+    func testSlideSplittingSkipsEmptySeparatorContinuations() {
+        let slides = SlideBuilder.build("# One\nhello\n---\n---\n## Two\nworld\n---")
+        XCTAssertEqual(slides.map(\.title), ["One", "Two"])
+        XCTAssertEqual(slides.map(\.body), ["hello", "world"])
+    }
+    func testSlideSplittingKeepsNonemptyContinuationsAndExplicitHeadings() {
+        let slides = SlideBuilder.build("# One\nhello\n---\ncontinued\n---\n# 続き\n# End")
+        XCTAssertEqual(slides.map(\.title), ["One", "続き", "続き", "End"])
+        XCTAssertEqual(slides.map(\.body), ["hello", "continued", "", ""])
+    }
+
 }
