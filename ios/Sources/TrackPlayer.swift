@@ -125,6 +125,7 @@ import MediaPlayer
                 position = narration.currentTime
             }
             playing = true
+            if let track { library.markPlayed(track.id, programID: radio?.playlist.id) }
             syncBGM(); updateInfo()
         } catch { pause(); self.error = error.localizedDescription }
     }

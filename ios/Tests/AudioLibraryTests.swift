@@ -21,6 +21,38 @@ final class AudioLibraryTests: XCTestCase {
     }
     private func directory() -> URL { FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString) }
 
+    func testPlaybackRecencyPersistsAndSurvivesSameAudioImport() throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let library = AudioLibrary(directory: root)
+        let track = manifest(script: nil)
+        let files = [ImportedAudioFile(name: "a.track.json", data: try JSONEncoder().encode(track)),
+                     ImportedAudioFile(name: "voice.wav", data: wav())]
+        try library.importTracks(files)
+        XCTAssertNil(library.index.tracks.first?.lastPlayedAt)
+        let programID = UUID()
+        try library.markPlayed(track.trackID, programID: programID)
+        let time = try XCTUnwrap(library.index.tracks.first?.lastPlayedAt)
+        try library.position(0.5, trackID: track.trackID)
+        try library.importTracks(files)
+        let restored = AudioLibrary(directory: root)
+        XCTAssertEqual(restored.index.tracks.first?.lastPlayedAt, time)
+        XCTAssertEqual(restored.index.tracks.first?.lastPlayedProgramID, programID)
+        XCTAssertEqual(HomeResumeSelection.track(in: restored.index.tracks)?.id, track.trackID)
+        try library.setListened(true, trackID: track.trackID)
+        XCTAssertNil(HomeResumeSelection.track(in: library.index.tracks))
+    }
+    func testHomePrioritizesLastReadingActivityOverEarlierPlayback() {
+        let a = Article(id: "20261001-171535", title: "RAG", path: "wiki/a.md", type: "study", tags: [], aliases: [], created: "", contentHash: String(repeating: "a", count: 64))
+        let track = AudioTrack(manifest: manifest(), localFile: "a.wav", script: nil,
+            lastPlayedAt: Date(timeIntervalSince1970: 100))
+        var records = StudyBackup()
+        records.progress[a.id] = ProgressRecord(title: "RAG", lastViewedAt: Date(timeIntervalSince1970: 50),
+            readingPosition: ReadingPosition(contentHash: a.contentHash, fraction: 0.3, updatedAt: Date(timeIntervalSince1970: 200)))
+        XCTAssertFalse(HomeResumeSelection.prefersAudio(article: a, track: track, records: records))
+        records.progress[a.id]?.readingPosition = nil
+        XCTAssertTrue(HomeResumeSelection.prefersAudio(article: a, track: track, records: records))
+        XCTAssertFalse(HomeResumeSelection.prefersAudio(article: a, track: nil, records: records))
+    }
     func testPreparedImportPreservesChangesMadeWhilePreparing() throws {
         let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
         let library = AudioLibrary(directory: root)

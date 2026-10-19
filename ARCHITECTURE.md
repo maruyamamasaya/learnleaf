@@ -1,6 +1,6 @@
 # アーキテクチャ
 
-更新: 2026-10-08
+更新: 2026-10-17
 
 ## iOSの図解・資料・スライド
 
@@ -53,7 +53,7 @@ Astro・OpenAI Sites・Codex CLIによる公開経路は現行構成にない。
 - `ios/Sources/ArticleClient.swift`: 専用一覧v1の検証、HTTPS取得、リダイレクト拒否、15秒の要求Timeout、最大3回の限定Retry、本文hash照合。
 - `ios/Sources/ArticleLinks.swift`: Frontmatter除去、コード内を除くWiki Link変換、一覧内のID・path・title・alias解決。
 - `ios/Sources/StudyStore.swift`: 独立した記録JSONのatomic保存、復元検証、monotonic uptimeでの計測区間。
-- `ios/Sources/StudyApp.swift`: 一覧・検索・フォルダ・本文・履歴・設定、画面とアプリ状態による計測制御。本文はMarkdownUI。下部タブは記事・聴く・見る・フォルダ・設定。検索は記事ホーム内のsheetで、履歴は設定のNavigationStack内で開く。
+- `ios/Sources/StudyApp.swift`: 一覧・検索・フォルダ・本文・履歴・設定、画面とアプリ状態による計測制御。本文はMarkdownUI。下部タブはホーム・探す・保存・聴く・設定。「探す」は独立したNavigationStackで、フォルダ・タグ・資料への入口も持つ。履歴は設定のNavigationStack内で開く。
 - `ios/Sources/AudioLibrary.swift`: 許可された制作物フォルダをbookmarkで保持し、起動/アクティブ復帰/手動操作で同期。管理JSONのarticleID/trackIDで自動紐付けと差し替えを行い、playlistIDとtrackIDsの番組一覧も同期する。Application Supportへコピーし、音声一覧と位置をatomic保存。学習記録バックアップとは独立。
 - `ios/Sources/TrackPlayer.swift`: AVAudioPlayerでナレーションとBGMを再生。倍速、位置保存、AudioSessionとMediaPlayerによるバックグラウンド・ロック画面操作、割り込み停止。
 - `ios/Sources/AudioView.swift`: 番組タイルと音声を統合したListeningHome、管理用番組一覧/詳細、専用再生画面、聴く/番組のミニプレイヤー、設定内の音声取り込みを担当。記事からは再生画面を直接開き、別の記事の音声なら再生を開始する。入力形式はios/AUDIO_IMPORT.md。
@@ -72,7 +72,7 @@ Astro・OpenAI Sites・Codex CLIによる公開経路は現行構成にない。
 
 - 記事カードとカルーセルはcatalogのタイトル・metadataだけで描画し、本文抜粋の表示/自動取得は行わない。Libraryは記事を開いた時と明示的な全文検索時に本文を取得し、hash照合後ID+hashでメモリcacheする。hash検証した本文をOfflineArticlesへ永続保存する。
 
-- `ios/Sources/ArticleCarousel.swift`: ホームの正方形記事タイルとLazyHStack横スクロール、viewAlignedスナップ。Dynamic Typeでカード寸法を拡大する。本文は取得せずcatalogとStudyStore/AudioLibraryの状態を使う。
+- `ios/Sources/ArticleCarousel.swift`: 正方形タイルと横スクロール部品を保持しているが、現行ホームでは使用しない。ホームの保存記事・ピックアップはSearchArticleRowの縦一覧を使い、本文は自動取得しない。
 
 - `ios/Sources/HistorySummary.swift`: sessionsを記事IDごとにまとめ、合計秒数と最新の区間終了時刻を計算する表示用集計。保存済みsessionを変更しない。
 
@@ -84,7 +84,7 @@ Astro・OpenAI Sites・Codex CLIによる公開経路は現行構成にない。
 
 - アプリ配信catalogのtypeは拡張可能な分類文字列（空なら未分類）として保持する。iOS画面はtypeで取得可否を決めない。ローカルVault同期は任意のtype・未指定を許可し、未指定を空文字列へ正規化する。配信v1ではtypeの文字列型を必須とする。
 
-- `ios/Sources/SearchView.swift`: SearchNavigationがタブ選択と検索条件を共有し、記事のタグや保存/フォルダ一覧から条件付きで検索タブを開く。記事はmetadataと明示操作で取得した本文、音声はタイトル/声/台本と関連記事metadata、番組はタイトルと構成音声/関連記事metadataを検索する。記事条件は関連する記事を持つ音声/番組へ適用し、番組は一致する構成音声が1本以上あれば候補にする。読了と聴取状態は各対象の保存状態を用いる。本文取得は直列でLibraryのhash照合とID+hashキャッシュを使い、取消後の結果反映を防ぐ。永続検索索引は保持せず、保存済み本文も明示操作の本文検索で使用する。
+- `ios/Sources/SearchView.swift`: SearchNavigationがタブ選択と検索条件を共有し、記事のタグや保存/フォルダ一覧から条件付きで検索タブを開く。外部入口のopenはrequestIDを更新して検索のNavigationStackを先頭へ戻し、通常のタブ切替は入力条件と遷移を保持する。上部TextFieldと解除可能な条件チップ、別sheetの絞り込み、検索前のタグ件数/履歴/最近開いた記事を表示。タグはcatalogから集計し架空のカテゴリを作らない。SearchArticleRowは本文を取得せずタイトル・タグ・状態と独立した保存操作を表示する。記事はmetadataと明示操作で取得した本文、音声はタイトル/声/台本と関連記事metadata、番組はタイトルと構成音声/関連記事metadataを検索する。記事条件は関連する記事を持つ音声/番組へ適用し、番組は一致する構成音声が1本以上あれば候補にする。読了と聴取状態は各対象の保存状態を用いる。本文取得は直列でLibraryのhash照合とID+hashキャッシュを使い、取消後の結果反映を防ぐ。永続検索索引は保持せず、保存済み本文も明示操作の本文検索で使用する。
 - `StudyBackdrop`と`StudyTileSurface`: 共通色と静的な局所光・細い縁を用いる。本文の背景は単色。タブ内部のList/Formは標準スクロール背景を隠し共通背景を見せる。Reduce Transparency/Increase Contrastでタイルの装飾と縁を調整し、常時アニメーションを導入しない。
 
 - ピックアップは各記事の順位hashを1回計算して並べ替える。ArticleListは記事集合・日付・手動入れ替え回数をtaskの識別値にし、別タスクで選出した結果をStateへ保持する。画面再評価ごとの選出を避け、取消された古い選出結果は反映しない。
@@ -103,3 +103,10 @@ Astro・OpenAI Sites・Codex CLIによる公開経路は現行構成にない。
 ## Macの起動と移行中の公開制御
 
 `start-learnleaf.command`は既存docsのHTTP配信のみ、`sync-and-publish.command`は公開CLIを起動する。両者はMacのLearnleaf Vaultを`STUDY_APP_VAULT`の既定値として設定する。原本照合は完了済み。公開用はwikiの存在を確認してからCLIへ渡す。Node 24のHomebrew kegを優先する。公開CLIはlearnleafのoriginだけを許可する。実際のリモート・配信URLと端末更新の残課題はMAC_MIGRATION.mdに記載。
+
+## ホームの再開と読書位置（2026-10-17）
+
+- `HomeResume.swift`: 未読了かつ配信一覧にある記事の最終閲覧/位置保存日時と、未聴取音声の`lastPlayedAt`を比較してホームの初期形式を選ぶ。読書/音声の再開・最近の学習・保存・ピックアップを表示。既存の音声位置と番組スナップショットを使い、明示操作で再生する。
+- `ReadingPosition.swift`: ArticleReader内の垂直UIScrollViewのoffset/sizeをKVOで観測する。delegateを変更せず、レイアウト安定後に相対位置を復元。指の操作/VoiceOverによる位置は0.4秒まとめて表示/保存し、離脱・バックグラウンドでも保存。UI観測用UIViewは状態をweak参照する。
+- StudyBackup v1の`ProgressRecord.readingPosition`はoptional（hash/fraction/updatedAt）。範囲とhash形式を検証し、atomic保存・書き出し/復元に含める。統合では更新日時が新しい位置を採用。記事のhash変更時は位置0を表示し、旧位置を無条件に新本文へ適用しない。位置は見出しではなく文書全体の相対位置。
+- AudioIndex v1の`AudioTrack.lastPlayedAt`/`lastPlayedProgramID`はoptional。TrackPlayerの再生開始成功時に保存し、同じ音声の再同期では維持、音声差し替えではリセットする。直前に単独音声を再生した場合は、古い番組スナップショットへ戻さない。旧データの再生順を位置の大きさから推測しない。詳細はADR-020。

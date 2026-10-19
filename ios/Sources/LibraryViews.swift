@@ -43,21 +43,13 @@ private struct ArticlePickRequest: Equatable {
     @AppStorage("study.pickupTag.v1") private var pickupTag = ""
     @State private var shuffle = 0
     @State private var day = ArticleDiscovery.dayKey()
-    @State private var showCollections = false
-    @State private var pendingCollectionSearch = false
     @State private var pickedArticles: [Article] = []
     var body: some View {
         let request = ArticlePickRequest(articles: ArticleDiscovery.pickupCandidates(library.articles, tag: pickupTag), day: day, shuffle: shuffle)
         return NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    Button {
-                        search.reset(); search.target = "すべて"; search.showingSearch = true
-                    } label: {
-                        Label("記事・音声・資料を検索", systemImage: "magnifyingglass")
-                            .frame(maxWidth: .infinity, alignment: .leading).padding(12)
-                            .background { StudyTileSurface() }
-                    }.buttonStyle(.plain)
+                    ResumeHomeSection()
                     if library.offlineCatalog { Label("保存した記事一覧", systemImage: "wifi.slash").font(.caption).foregroundStyle(.secondary) }
                     if library.loading { ProgressView("記事を更新中").frame(maxWidth: .infinity) }
                     if let error = library.error {
@@ -65,7 +57,17 @@ private struct ArticlePickRequest: Equatable {
                         Button("再試行") { Task { await library.reload() } }
                     }
                     HStack {
-                        Text("今日のピックアップ").font(.subheadline.weight(.semibold))
+                        Text("保存した記事").font(.subheadline.bold())
+                        Spacer()
+                        Button("すべて") { search.tab = 2 }.font(.footnote)
+                    }
+                    let favorites = library.articles.filter { store.isFavorite($0.id) }
+                    ForEach(Array(favorites.prefix(2))) { SearchArticleRow(article: $0) }
+                    if favorites.isEmpty {
+                        Button("自分の本棚を開く", systemImage: "bookmark") { search.tab = 2 }
+                    }
+                    HStack {
+                        Text("新しく学ぶ").font(.subheadline.bold())
                         Spacer()
                         Button { shuffle += 1 } label: { Image(systemName: "shuffle").frame(width: 44, height: 44) }.accessibilityLabel("別の記事を選ぶ")
                     }
@@ -76,28 +78,19 @@ private struct ArticlePickRequest: Equatable {
                             Text(pickupTag + "（現在の記事なし）").tag(pickupTag)
                         }
                     }.font(.footnote)
+                    ForEach(pickedArticles) { SearchArticleRow(article: $0) }
                     if pickedArticles.isEmpty && !library.loading && !pickupTag.isEmpty {
                         Text("このタグの記事はありません。対象を変更してください。").font(.caption).foregroundStyle(.secondary)
                     }
-                    ArticleCarousel(articles: pickedArticles).id(day + "/" + String(shuffle))
-                    let favorites = library.articles.filter { store.isFavorite($0.id) }
-                    if !favorites.isEmpty {
-                        HStack {
-                            Text("お気に入り").font(.subheadline.weight(.semibold))
-                            Spacer()
-                            Button("すべて") { search.open(favorites: true) }.font(.footnote)
-                        }
-                        ArticleCarousel(articles: favorites)
-                    }
-                    HStack(spacing: 12) {
-                        Button { showCollections = true } label: { homeEntry("コレクション", icon: "square.stack", subtitle: "自分の本棚") }
-                    }.buttonStyle(.plain)
                     if library.articles.isEmpty && !library.loading && library.error == nil {
                         ContentUnavailableView("記事がありません", systemImage: "books.vertical", description: Text("下に引っ張って一覧を更新してください。"))
                     }
                 }.padding(20).frame(maxWidth: 760).frame(maxWidth: .infinity)
             }.background { StudyBackdrop() }
                 .navigationTitle("Learnleaf").navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    Button { search.open() } label: { Label("記事・音声・資料を検索", systemImage: "magnifyingglass") }
+                }
                 .refreshable { await library.reload() }
                 .task(id: request) {
                     let selected = await Task.detached(priority: .userInitiated) {
@@ -110,30 +103,7 @@ private struct ArticlePickRequest: Equatable {
                     let next = ArticleDiscovery.dayKey()
                     if next != day { day = next; shuffle = 0 }
                 }
-                .sheet(isPresented: $showCollections, onDismiss: {
-                    if pendingCollectionSearch { pendingCollectionSearch = false; search.showingSearch = true }
-                }) { NavigationStack { CollectionsView() } }
-                .onChange(of: search.showingSearch) { _, showing in
-                    if showing && showCollections {
-                        pendingCollectionSearch = true; search.showingSearch = false; showCollections = false
-                    }
-                }
-                .sheet(isPresented: $search.showingSearch) {
-                    SearchView()
-                        .safeAreaInset(edge: .top) {
-                            HStack { Spacer(); Button("閉じる") { search.showingSearch = false } }.padding(12)
-                        }
-                }
         }
-    }
-    private func homeEntry(_ title: String, icon: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon).font(.title2).foregroundStyle(design.accent)
-            Spacer(minLength: 8)
-            Text(title).font(.footnote.bold()).foregroundStyle(.primary)
-            Text(subtitle).font(.caption).foregroundStyle(.secondary)
-        }.padding(14).frame(maxWidth: .infinity, alignment: .leading).aspectRatio(1, contentMode: .fit)
-            .background { StudyTileSurface() }
     }
 }
 
@@ -294,7 +264,6 @@ private struct ArticlePickRequest: Equatable {
     @Environment(\.studyTheme) private var design
     @EnvironmentObject private var store: StudyStore
     @EnvironmentObject private var library: Library
-    @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var showName = false
     @State private var editing: UUID?
@@ -327,8 +296,7 @@ private struct ArticlePickRequest: Equatable {
             }.listRowBackground(design.surface)
         }
         .scrollContentBackground(.hidden)
-        .background { StudyBackdrop() }.navigationTitle("自分の本棚")
-            .toolbar { Button("閉じる") { dismiss() } }
+        .background { StudyBackdrop() }.navigationTitle("保存")
             .alert(editing == nil ? "新しいコレクション" : "名前を変更", isPresented: $showName) {
                 TextField("名前", text: $name)
                 Button("保存") { if let editing { store.renameCollection(editing, name: name) } else { store.createCollection(name) } }
@@ -440,5 +408,46 @@ private struct ArticlePickRequest: Equatable {
             }
         }.navigationTitle("コレクションを聴く").navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden).background { StudyBackdrop() }
+    }
+}
+
+// A compact result row keeps the reading and saving targets separate.
+@MainActor struct SearchArticleRow: View {
+    let article: Article
+    @EnvironmentObject private var store: StudyStore
+    @EnvironmentObject private var audio: AudioLibraryModel
+    @Environment(\.studyTheme) private var design
+    @State private var showSave = false
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            NavigationLink {
+                ArticleReader(article: article)
+            } label: {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(article.title).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if !article.tags.isEmpty {
+                        Text(article.tags.prefix(3).map { "#" + $0 }.joined(separator: "  "))
+                            .font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                    }
+                    HStack(spacing: 10) {
+                        if audio.index.tracks.contains(where: { $0.manifest.articleID == article.id }) {
+                            Label("音声あり", systemImage: "headphones")
+                        }
+                        if store.data.progress[article.id]?.completed == true {
+                            Label("読了", systemImage: "checkmark.circle")
+                        } else if store.data.progress[article.id]?.lastViewedAt != nil { Text("途中") }
+                    }.font(.caption).foregroundStyle(.secondary)
+                }.padding(.vertical, 14).frame(maxWidth: .infinity, minHeight: 68, alignment: .leading)
+                    .contentShape(Rectangle())
+            }.buttonStyle(.plain).accessibilityIdentifier("discovery.article." + article.id)
+            Button { showSave = true } label: {
+                Image(systemName: store.isFavorite(article.id) ? "bookmark.fill" : "bookmark")
+                    .foregroundStyle(design.accent).frame(width: 44, height: 44)
+            }.buttonStyle(.plain).padding(.top, 6)
+                .accessibilityLabel(article.title + "を保存・整理")
+        }
+        .overlay(alignment: .bottom) { Divider() }
+        .sheet(isPresented: $showSave) { SaveArticleView(article: article) }
     }
 }

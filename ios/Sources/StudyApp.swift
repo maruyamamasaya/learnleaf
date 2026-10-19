@@ -123,10 +123,10 @@ import UniformTypeIdentifiers
     var body: some Scene {
         WindowGroup {
             TabView(selection: $search.tab) {
-                PlayerTabContent { ArticleList() }.tabItem { Label("記事", systemImage: "books.vertical") }.tag(0)
-                PlayerTabContent { NavigationStack { ListeningHome() } }.tabItem { Label("聴く", systemImage: "headphones") }.tag(1)
-                PlayerTabContent { NavigationStack { VisualLibraryView(viewingOnly: true) } }.tabItem { Label("見る", systemImage: "play.rectangle") }.tag(2)
-                PlayerTabContent { NavigationStack { FolderBrowser() } }.tabItem { Label("フォルダ", systemImage: "folder") }.tag(3)
+                PlayerTabContent { ArticleList() }.tabItem { Label("ホーム", systemImage: "house") }.tag(0)
+                PlayerTabContent { SearchView().id(search.requestID) }.tabItem { Label("探す", systemImage: "magnifyingglass") }.tag(1)
+                PlayerTabContent { NavigationStack { CollectionsView() } }.tabItem { Label("保存", systemImage: "bookmark") }.tag(2)
+                PlayerTabContent { NavigationStack { ListeningHome() } }.tabItem { Label("聴く", systemImage: "headphones") }.tag(3)
                 PlayerTabContent { SettingsView() }.tabItem { Label("設定", systemImage: "gearshape") }.tag(4)
             }
             .font(.callout)
@@ -181,6 +181,7 @@ import UniformTypeIdentifiers
     @EnvironmentObject private var store: StudyStore
     @EnvironmentObject private var search: SearchNavigation
     @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var readingScroll = ReadingScrollState()
     @State private var markdown: String?
     @State private var error: String?
     @State private var visible = false
@@ -240,9 +241,16 @@ import UniformTypeIdentifiers
                     Button("一覧を更新して再試行") { Task { await library.reload(); await load() } }
                 } else { ProgressView("本文を取得中") }
             }.padding(22).frame(maxWidth: 760, alignment: .leading).frame(maxWidth: .infinity)
+                .background { ReadingScrollObserver(state: readingScroll) }
         }
         .background(design.readerSurface)
         .toolbar {
+            Menu {
+                Button("先頭から読む") { readingScroll.startOver() }
+                if readingScroll.updatedArticle { Text("記事が更新されたため先頭から表示しています。") }
+            } label: { Text("\(Int(readingScroll.fraction * 100))%") }
+                .accessibilityLabel("読書位置 \(Int(readingScroll.fraction * 100))%")
+                .accessibilityIdentifier("reader.position")
             Button { showSave = true } label: {
                 Image(systemName: store.isFavorite(article.id) ? "bookmark.fill" : "bookmark")
             }.accessibilityLabel("お気に入り・コレクションに保存")
@@ -251,9 +259,11 @@ import UniformTypeIdentifiers
         .onChange(of: showSave) { _, showing in visible = !showing; syncTimer() }
         .navigationTitle(article.title).navigationBarTitleDisplayMode(.inline)
         .task { await load() }
-        .onAppear { visible = true; syncTimer() }
-        .onDisappear { visible = false; syncTimer() }
-        .onChange(of: scenePhase) { _, _ in syncTimer() }
+        .onAppear { visible = true; readingScroll.active = scenePhase == .active; syncTimer() }
+        .onDisappear { readingScroll.leave(); visible = false; syncTimer() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { readingScroll.checkpoint() }; readingScroll.active = visible && phase == .active; syncTimer()
+        }
         .onReceive(pulse) { _ in timer.flush(articleID: article.id, store: store, resume: running) }
         .sheet(isPresented: $showCandidates) {
             NavigationStack {
@@ -274,7 +284,7 @@ import UniformTypeIdentifiers
         }
         .alert("リンクを開けません", isPresented: $linkNotice) {
             Button("閉じる", role: .cancel) { }
-        } message: { Text("記事が見つからないか、未対応のリンクです。見出しリンクは現在、記事の先頭を開きます。") }
+        } message: { Text("記事が見つからないか、未対応のリンクです。指定した見出しへの移動には対応していません。") }
     }
     private var relatedContent: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -323,7 +333,8 @@ import UniformTypeIdentifiers
                 markdown = ArticleLinks.body(try await library.content(updated))
             }
             try Task.checkCancellation()
-            store.viewed(latest); syncTimer()
+            readingScroll.prepare(article: current, store: store)
+            store.viewed(current); syncTimer()
         } catch is CancellationError { markdown = nil }
         catch { self.error = error.localizedDescription }
     }

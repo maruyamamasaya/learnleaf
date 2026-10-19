@@ -5,6 +5,7 @@ struct ProgressRecord: Codable {
     var title: String
     var completed = false
     var lastViewedAt: Date?
+    var readingPosition: ReadingPosition? = nil
 }
 struct StudySession: Codable, Identifiable {
     let id: UUID
@@ -23,6 +24,7 @@ struct StudyBackup: Codable {
     func validated() throws -> StudyBackup {
         guard schemaVersion == 1, Set(sessions.map(\.id)).count == sessions.count,
               progress.keys.allSatisfy({ Catalog.matches($0, "^[0-9]{8}-[0-9]{6}$") }),
+              progress.values.allSatisfy({ $0.readingPosition?.isValid ?? true }),
               sessions.allSatisfy({ Catalog.matches($0.articleId, "^[0-9]{8}-[0-9]{6}$") &&
                   $0.durationSeconds.isFinite && $0.durationSeconds >= 0 && $0.durationSeconds <= 86400 })
         else { throw ReaderError.message("バックアップの形式が不正です。") }
@@ -83,6 +85,14 @@ struct StudyBackup: Codable {
             var record = next.progress[article.id] ?? ProgressRecord(title: article.title)
             record.title = article.title
             record.lastViewedAt = Date()
+            next.progress[article.id] = record
+        }
+    }
+    func saveReadingPosition(_ article: Article, fraction: Double) {
+        guard fraction.isFinite, (0...1).contains(fraction) else { return }
+        update { next in
+            var record = next.progress[article.id] ?? ProgressRecord(title: article.title)
+            record.readingPosition = ReadingPosition(contentHash: article.contentHash, fraction: fraction, updatedAt: Date())
             next.progress[article.id] = record
         }
     }
@@ -194,6 +204,10 @@ enum StudyRecordMerge {
                 old.completed = old.completed || record.completed
                 if (record.lastViewedAt ?? .distantPast) > (old.lastViewedAt ?? .distantPast) {
                     old.title = record.title; old.lastViewedAt = record.lastViewedAt
+                }
+                if let position = record.readingPosition,
+                   position.updatedAt > (old.readingPosition?.updatedAt ?? .distantPast) {
+                    old.readingPosition = position
                 }
                 result.progress[id] = old
             } else { result.progress[id] = record }

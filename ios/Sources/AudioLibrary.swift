@@ -33,6 +33,8 @@ struct AudioTrack: Codable, Identifiable {
     var audioHash: String? = nil
     var positionSeconds: Double = 0
     var listened: Bool? = nil
+    var lastPlayedAt: Date? = nil
+    var lastPlayedProgramID: UUID? = nil
     var isListened: Bool { listened == true }
 }
 struct AudioIndex: Codable {
@@ -54,7 +56,7 @@ struct AudioIndex: Codable {
         for track in tracks {
             _ = try track.manifest.validated()
             guard AudioLibrary.safeFilename(track.localFile), track.positionSeconds.isFinite,
-                  track.positionSeconds >= 0 else { throw ReaderError.invalid }
+                  track.positionSeconds >= 0, track.lastPlayedAt?.timeIntervalSince1970.isFinite ?? true else { throw ReaderError.invalid }
         }
         let programs = self.programs ?? []
         guard Set(programs.map(\.id)).count == programs.count else { throw ReaderError.invalid }
@@ -241,7 +243,9 @@ final class AudioLibrary {
                 }
                 let track = AudioTrack(manifest: manifest, localFile: filename, script: script,
                     audioHash: hash, positionSeconds: sameAudio ? (old?.positionSeconds ?? 0) : 0,
-                    listened: sameAudio ? old?.listened : nil)
+                    listened: sameAudio ? old?.listened : nil,
+                    lastPlayedAt: sameAudio ? old?.lastPlayedAt : nil,
+                    lastPlayedProgramID: sameAudio ? old?.lastPlayedProgramID : nil)
                 if let oldIndex { next.tracks[oldIndex] = track } else { next.tracks.append(track) }
                 changed += 1
             }
@@ -314,6 +318,13 @@ final class AudioLibrary {
         do { var next = index; next.bgmFile = filename; try save(next) }
         catch { try? FileManager.default.removeItem(at: url(filename)); throw error }
         // 前のBGMは取り込み成功後にのみ削除してもよいが、初期版では保持する。
+    }
+    func markPlayed(_ trackID: UUID, programID: UUID? = nil) throws {
+        var next = index
+        guard let i = next.tracks.firstIndex(where: { $0.id == trackID }) else { return }
+        next.tracks[i].lastPlayedAt = Date()
+        next.tracks[i].lastPlayedProgramID = programID
+        try save(next)
     }
     func position(_ seconds: Double, trackID: UUID) throws {
         var next = index
@@ -403,6 +414,10 @@ final class AudioLibrary {
     }
     func editPrograms(_ operation: (AudioLibrary) throws -> Void) {
         do { try operation(storage); index = storage.index }
+        catch { self.error = error.localizedDescription }
+    }
+    func markPlayed(_ id: UUID, programID: UUID? = nil) {
+        do { try storage.markPlayed(id, programID: programID); index = storage.index }
         catch { self.error = error.localizedDescription }
     }
     func savePosition(_ seconds: Double, id: UUID) {

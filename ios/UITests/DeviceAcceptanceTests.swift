@@ -14,20 +14,23 @@ final class DeviceAcceptanceTests: XCTestCase {
         tree.name = name + " hierarchy"; tree.lifetime = .keepAlways; add(tree)
     }
     func testReadingListeningAndVisualEntryPoints() {
-        XCTAssertTrue(app.tabBars.buttons["記事"].waitForExistence(timeout: 30))
+        XCTAssertTrue(app.tabBars.buttons["ホーム"].waitForExistence(timeout: 30))
         capture("Article home")
         app.buttons["記事・音声・資料を検索"].tap()
-        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 10))
-        app.searchFields.firstMatch.tap()
-        app.searchFields.firstMatch.typeText("RAG")
+        XCTAssertTrue(app.textFields["discovery.query"].waitForExistence(timeout: 10))
+        app.textFields["discovery.query"].tap()
+        app.textFields["discovery.query"].typeText("RAG\n")
         capture("Search results")
-        app.buttons["閉じる"].tap()
         app.tabBars.buttons["聴く"].tap()
         capture("Listening home")
-        app.tabBars.buttons["見る"].tap()
+        openVisualLibrary()
         capture("Visual library")
         app.tabBars.buttons["設定"].tap()
         capture("Settings")
+    }
+    private func openVisualLibrary() {
+        app.tabBars.buttons["設定"].tap()
+        app.buttons["図解・資料ライブラリ"].tap()
     }
     private func scrollTo(_ element: XCUIElement, limit: Int = 20) {
         for _ in 0..<limit {
@@ -38,7 +41,7 @@ final class DeviceAcceptanceTests: XCTestCase {
     }
     func testArticleAndPresentation() {
         app.buttons["記事・音声・資料を検索"].tap()
-        let field = app.searchFields.firstMatch
+        let field = app.textFields["discovery.query"]
         XCTAssertTrue(field.waitForExistence(timeout: 10))
         field.tap(); field.typeText("RAGとは\n")
         let article = app.buttons.containing(.staticText, identifier: "RAGとは").firstMatch
@@ -70,7 +73,7 @@ final class DeviceAcceptanceTests: XCTestCase {
         XCTAssertTrue(pause.waitForExistence(timeout: 10))
         capture("Audio after background")
         pause.tap()
-        app.tabBars.buttons["記事"].tap()
+        app.tabBars.buttons["ホーム"].tap()
         capture("Mini player on article tab")
     }
 
@@ -98,7 +101,7 @@ final class DeviceAcceptanceTests: XCTestCase {
     }
     private func removeTestResource(title: String, kind: String) {
         app.terminate(); app.launch()
-        app.tabBars.buttons["見る"].tap()
+        openVisualLibrary()
         let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", title + ",", kind)).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 10)); row.swipeLeft()
         app.buttons["削除"].tap()
@@ -108,7 +111,7 @@ final class DeviceAcceptanceTests: XCTestCase {
     }
 
     func testPDFImportFromFiles() {
-        app.tabBars.buttons["見る"].tap()
+        openVisualLibrary()
         app.buttons["plus"].tap()
         let back = app.buttons["BackButton"].firstMatch
         XCTAssertTrue(back.waitForExistence(timeout: 10)); back.tap()

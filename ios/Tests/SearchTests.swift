@@ -29,6 +29,41 @@ final class SearchTests: XCTestCase {
         XCTAssertTrue(SearchNavigation(defaults: defaults).preferences.saved.isEmpty)
         XCTAssertTrue(SearchNavigation(defaults: defaults).preferences.history.isEmpty)
     }
+    @MainActor func testExternalSearchOpensArticleTabAndResetsPreviousRoute() {
+        let suite = "search-routing-" + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let search = SearchNavigation(defaults: defaults)
+        XCTAssertEqual(search.target, "記事")
+        search.tab = 4
+        search.query = "古いキーワード"; search.target = "資料"; search.audioOnly = true
+        let request = search.requestID
+        let collection = UUID()
+        search.open(tag: "RAG", folder: "wiki", favorites: true, collection: collection)
+        XCTAssertEqual(search.tab, 1)
+        XCTAssertEqual(search.target, "記事")
+        XCTAssertEqual(search.query, "")
+        XCTAssertFalse(search.audioOnly)
+        XCTAssertEqual(search.tag, "RAG")
+        XCTAssertEqual(search.folder, "wiki")
+        XCTAssertEqual(search.collection, collection)
+        XCTAssertTrue(search.favorites)
+        XCTAssertNotEqual(search.requestID, request)
+        let nextRequest = search.requestID
+        search.open()
+        XCTAssertNotEqual(search.requestID, nextRequest)
+        XCTAssertEqual(search.conditions, SearchConditions(target: "記事"))
+    }
+    @MainActor func testClearFiltersKeepsKeyword() {
+        let suite = "search-clear-" + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let search = SearchNavigation(defaults: defaults)
+        search.query = "RAG"; search.tag = "API"; search.target = "音声"
+        search.favorites = true; search.state = "完了"; search.order = "タイトル"
+        search.clearFilters()
+        XCTAssertEqual(search.conditions, SearchConditions(query: "RAG", target: "記事"))
+    }
     func testCombinedFiltersBodySearchAndMissingCollection() {
         let a = Article(id: "20261001-171535", title: "B", path: "wiki/rag/a.md", type: "study", tags: ["RAG"], aliases: [], created: "2026-10-01 17:15:35", contentHash: String(repeating: "a", count: 64))
         let b = Article(id: "20261001-171536", title: "A", path: "wiki/other/b.md", type: "study", tags: ["RAG"], aliases: [], created: "2026-10-01 17:15:36", contentHash: String(repeating: "b", count: 64))
